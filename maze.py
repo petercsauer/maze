@@ -2,7 +2,7 @@ import random
 
 m = 10
 n = 10
-
+visited = []
 
 def addTwohopNeighbor(x,y,m,n,f):
     
@@ -27,7 +27,8 @@ def addTwohopNeighbor(x,y,m,n,f):
     return f
 
 def oneAwayHelper(x,y,f):
-    if (x-1,y) not in f and (x+1,y) not in f and (x,y-1) not in f and (x,y+1) not in f:
+    if (x,y) not in visited:
+        # (x-1,y) not in f and (x+1,y) not in f and (x,y-1) not in f and (x,y+1) not in f and (x,y)
         return True
     else:
         return False
@@ -89,7 +90,8 @@ def createmaze(m,n):
     printMaze(maze)
     rand_x = random.randint(0,m-1)
     rand_y = random.randint(0,n-1)
-    maze[rand_x][rand_y] = ' '
+    maze[rand_x][rand_y] = 'S'
+    visited.append((rand_x, rand_y))
     frontier = addTwohopNeighbor(rand_x,rand_y,m,n,frontier)
 
     iter = 0
@@ -97,12 +99,13 @@ def createmaze(m,n):
         neighbors = []
         print(frontier)
         cellC = frontier[random.randint(0,len(frontier)-1)]
+        visited.append(cellC)
         neighbors = addTwohopNeighbor(cellC[0],cellC[1],m,n,neighbors)
         print("neighbors:"+str(neighbors))
 
         while len(neighbors)>0:
             cellF=neighbors[random.randint(0,len(neighbors)-1)]
-            if maze[cellF[0]][cellF[1]]==' ':
+            if maze[cellF[0]][cellF[1]]==' ' or maze[cellF[0]][cellF[1]]=='S':
                 break
             else:  
                 neighbors.remove(cellF)
@@ -112,6 +115,8 @@ def createmaze(m,n):
         print("F:"+str(cellF))
         print("A:"+str(cellA))
         maze[cellA[0]][cellA[1]]=' '
+        visited.append(cellF)
+        visited.append(cellA)
         frontier.remove(cellC)
         frontier=addTwohopWalls(cellA[0],cellA[1],m,n,frontier,maze)
         printMaze(maze)
