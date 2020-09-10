@@ -1,7 +1,7 @@
 import random
 
-m = 5
-n = 5
+m = 10
+n = 10
 
 
 def addTwohopNeighbor(x,y,m,n,f):
@@ -15,16 +15,22 @@ def addTwohopNeighbor(x,y,m,n,f):
     #     f.append((x+1,y-1))
     # if x+1<m and y+1<n:
     #     f.append((x+1,y+1))
-    if x+2<m:
+    if x+2<m and oneAwayHelper(x+2,y,f):
         f.append((x+2,y))
-    if x-2>=0:
+    if x-2>=0 and oneAwayHelper(x-2,y,f):
         f.append((x-2,y))
-    if y+2<n:
+    if y+2<n and oneAwayHelper(x,y+2,f):
         f.append((x,y+2))
-    if y-2>=0:
+    if y-2>=0 and oneAwayHelper(x,y-2,f):
         f.append((x,y-2))
 
     return f
+
+def oneAwayHelper(x,y,f):
+    if (x-1,y) not in f and (x+1,y) not in f and (x,y-1) not in f and (x,y+1) not in f:
+        return True
+    else:
+        return False
 
 def addTwohopWalls(x,y,m,n,f,maze):
     #x+2, x-2, y+2, y-2, (y+1,x+1),(y-1,x-1),(y+1,x-1),(y-1,x+1)
@@ -46,19 +52,19 @@ def addTwohopWalls(x,y,m,n,f,maze):
     #             f.append((x+1,y+1))
     if x+2<m:
         if maze[x+2][y]=='#':
-            if (x+2,y) not in f:
+            if (x+2,y) not in f and oneAwayHelper(x+2,y,f):
                 f.append((x+2,y))
     if x-2>=0:
         if maze[x-2][y]=='#':
-            if (x-2,y) not in f:
+            if (x-2,y) not in f and oneAwayHelper(x-2,y,f):
                 f.append((x-2,y))
     if y+2<n:
         if maze[x][y+2]=='#':
-            if (x,y+2) not in f:
+            if (x,y+2) not in f and oneAwayHelper(x,y+2,f):
                 f.append((x,y+2))
     if y-2>=0:
         if maze[x][y-2]=='#':
-            if (x,y-2) not in f:
+            if (x,y-2) not in f and oneAwayHelper(x,y-2,f):
                 f.append((x,y-2))
      
     return f
