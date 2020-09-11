@@ -1,6 +1,6 @@
 import random
 
-m = 15
+m = 30
 n = 30
 maze=[]
 
@@ -107,6 +107,7 @@ def createmaze(m,n):
 
 
 def writeMaze():
+    open('maze.txt', 'w').close()
     f = open("maze.txt", "a")
     for m in maze:
         line = ''.join(m)
@@ -115,13 +116,10 @@ def writeMaze():
     f.close
 
 
+
 createmaze(m,n)
 writeMaze()
-# frontier = []
 
-# frontier = addTwohopNeighbor(1,1,m,n,frontier)
-
-# print(frontier)
 
     
         
