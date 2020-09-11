@@ -1,10 +1,10 @@
 import random
 
-m = 10
-n = 10
+m = 5
+n = 5
 visited = []
 
-def addTwohopNeighbor(x,y,m,n,f):
+def addOnehopNeighbor(x,y,m,n,f):
     
     #x+2, x-2, y+2, y-2, (y+1,x+1),(y-1,x-1),(y+1,x-1),(y-1,x+1)
     # if x-1>=0 and y-1>=0:
@@ -15,23 +15,25 @@ def addTwohopNeighbor(x,y,m,n,f):
     #     f.append((x+1,y-1))
     # if x+1<m and y+1<n:
     #     f.append((x+1,y+1))
-    if x+2<m and oneAwayHelper(x+2,y,f):
-        f.append((x+2,y))
-    if x-2>=0 and oneAwayHelper(x-2,y,f):
-        f.append((x-2,y))
-    if y+2<n and oneAwayHelper(x,y+2,f):
-        f.append((x,y+2))
-    if y-2>=0 and oneAwayHelper(x,y-2,f):
-        f.append((x,y-2))
+    global maze
+    if x+1<m:
+        if maze[x+1][y]=='#':
+            if (x+1,y) not in f:
+                f.append((x+1,y))
+    if x-1>=0:
+        if maze[x-1][y]=='#':
+            if (x-1,y) not in f:
+                f.append((x-1,y))
+    if y+1<n:
+        if maze[x][y+1]=='#':
+            if (x,y+1) not in f:
+                f.append((x,y+1))
+    if y-1>=0:
+        if maze[x][y-1]=='#':
+            if (x,y-1) not in f:
+                f.append((x,y-1))
 
     return f
-
-def oneAwayHelper(x,y,f):
-    if (x,y) not in visited:
-        # (x-1,y) not in f and (x+1,y) not in f and (x,y-1) not in f and (x,y+1) not in f and (x,y)
-        return True
-    else:
-        return False
 
 def addTwohopWalls(x,y,m,n,f,maze):
     #x+2, x-2, y+2, y-2, (y+1,x+1),(y-1,x-1),(y+1,x-1),(y-1,x+1)
@@ -53,19 +55,19 @@ def addTwohopWalls(x,y,m,n,f,maze):
     #             f.append((x+1,y+1))
     if x+2<m:
         if maze[x+2][y]=='#':
-            if (x+2,y) not in f and oneAwayHelper(x+2,y,f):
+            if (x+2,y) not in f:
                 f.append((x+2,y))
     if x-2>=0:
         if maze[x-2][y]=='#':
-            if (x-2,y) not in f and oneAwayHelper(x-2,y,f):
+            if (x-2,y) not in f:
                 f.append((x-2,y))
     if y+2<n:
         if maze[x][y+2]=='#':
-            if (x,y+2) not in f and oneAwayHelper(x,y+2,f):
+            if (x,y+2) not in f:
                 f.append((x,y+2))
     if y-2>=0:
         if maze[x][y-2]=='#':
-            if (x,y-2) not in f and oneAwayHelper(x,y-2,f):
+            if (x,y-2) not in f:
                 f.append((x,y-2))
      
     return f
@@ -78,10 +80,21 @@ def printMaze(m):
         print()
     print()
 
+def twoAwayHelper(cellC, cellF, m, n):
+    if (cellF[0]-cellC[0])>0 and cellF[0]+1<m:
+        return (cellF[0]+1,cellF[1])
+    if (cellF[0]-cellC[0])<0 and cellF[0]-1>=0:
+        return (cellF[0]-1,cellF[1])
+    if (cellF[1]-cellC[1])>0 and cellF[1]+1<n:
+        return (cellF[0],cellF[1]+1)
+    if (cellF[1]-cellC[1])<0 and cellF[1]-1>=0:
+        return (cellF[0],cellF[1]-1)
+    return False
+
 def createmaze(m,n):
     frontier = []
 
-    maze = []
+
     #maze = [['#'] * m for i in range(n)]
     for x in range(0,m):
         maze.append([])
@@ -90,60 +103,38 @@ def createmaze(m,n):
     printMaze(maze)
     rand_x = random.randint(0,m-1)
     rand_y = random.randint(0,n-1)
-    maze[rand_x][rand_y] = 'S'
-    visited.append((rand_x, rand_y))
-    frontier = addTwohopNeighbor(rand_x,rand_y,m,n,frontier)
+    maze[rand_x][rand_y] = ' '
+    frontier = addOnehopNeighbor(rand_x,rand_y,m,n,frontier)
+    visited.append((rand_x,rand_y))
 
-    iter = 0
     while len(frontier)>0:
         neighbors = []
         print(frontier)
         cellC = frontier[random.randint(0,len(frontier)-1)]
         visited.append(cellC)
-        neighbors = addTwohopNeighbor(cellC[0],cellC[1],m,n,neighbors)
-        print("neighbors:"+str(neighbors))
+        neighbors = addOnehopNeighbor(cellC[0],cellC[1],m,n,neighbors)
 
         while len(neighbors)>0:
             cellF=neighbors[random.randint(0,len(neighbors)-1)]
-            if maze[cellF[0]][cellF[1]]==' ' or maze[cellF[0]][cellF[1]]=='S':
-                break
-            else:  
-                neighbors.remove(cellF)
-               
-        cellA=[int(abs((cellC[0]+cellF[0])/2)),int(abs((cellC[1]+cellF[1])/2))]
-        print("C:"+str(cellC))
-        print("F:"+str(cellF))
-        print("A:"+str(cellA))
-        maze[cellA[0]][cellA[1]]=' '
-        visited.append(cellF)
-        visited.append(cellA)
+            if twoAwayHelper(cellC, cellF, m, n):
+                if (twoAwayHelper(cellC, cellF, m, n)[0],twoAwayHelper(cellC, cellF, m, n)[1]) in visited:
+                    neighbors.remove(cellF)
+                else:  
+                    break
         frontier.remove(cellC)
-        frontier=addTwohopWalls(cellA[0],cellA[1],m,n,frontier,maze)
-        printMaze(maze)
-        iter+=1
+        visited.append(cellF)
+        maze[cellF[0]][cellF[1]]=' '
+        frontier = addOnehopNeighbor(cellF[0],cellF[1],m,n,frontier)
+       
 
-    # neighbors = []
-    # cellC = frontier[random.randint(0,len(frontier)-1)]
-    # neighbors = addTwohopNeighbor(cellC[0],cellC[1],m,n,neighbors)
-    # free = False
-    # while not free:
-    #     cellF=neighbors[random.randint(0,len(neighbors)-1)]
-    #     if maze[cellF[0]][cellF[1]]==' ':
-    #         free=True
-    # cellA=[int(abs((cellC[0]+cellF[0])/2)),int(abs((cellC[1]+cellF[1])/2))]
-    # maze[cellA[0]][cellA[1]]=' '
-    # frontier.remove(cellC)
-    # frontier=addTwohopWalls(cellA[0],cellA[1],m,n,frontier,maze)
 
-    # print(maze)
     printMaze(maze)
 
+
+
+maze = []
 createmaze(m,n)
-# frontier = []
 
-# frontier = addTwohopNeighbor(1,1,m,n,frontier)
-
-# print(frontier)
 
     
         
